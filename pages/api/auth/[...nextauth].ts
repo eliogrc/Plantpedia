@@ -4,7 +4,7 @@ import Providers from "next-auth/providers";
 
 const options: NextAuthOptions = {
   theme: "light",
-  debug: true,
+  debug: process.env.NODE_ENV === 'development',
   session: {
     jwt: true,
     maxAge: 60 * 15, // 15 minutes,

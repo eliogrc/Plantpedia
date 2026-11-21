@@ -61,7 +61,7 @@ export const Footer = ({ className }: { className?: string }) => {
             </a>
           </p>
           <p>
-            eligarc
+            eliogrc
           </p>
         </div>
       </div>
