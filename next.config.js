@@ -46,8 +46,12 @@ const nextConfig = {
       },
     ]
   },
+  // Turns off the built-in optimizer (/_next/image answers 404): it carries Next 10's
+  // critical RCE advisories, and every image already uses Contentful's own resizing
+  // through the custom loader in components/Image.tsx.
   images: {
-    domains: ['images.ctfassets.net'],
+    loader: 'imgix',
+    path: 'https://images.ctfassets.net/',
   },
   i18n,
 }
