@@ -31,8 +31,8 @@ export function Header() {
 
 function NavLink({ children, ...linkProps }: PropsWithChildren<LinkProps>) {
   return (
-    <Link {...linkProps} prefetch={false} passHref>
-      <Button color="inherit" variant="text" component="a">
+    <Link {...linkProps} prefetch={false} className="no-underline">
+      <Button color="inherit" variant="text" component="span">
         {children}
       </Button>
     </Link>

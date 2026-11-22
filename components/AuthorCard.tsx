@@ -17,13 +17,14 @@ export function AuthorCard({
           {fullName}
         </Typography>
         <Typography variant="body1" color="textSecondary" className="py-4">
-          {biography}
+          {typeof biography === 'string' ? biography : ''}
         </Typography>
         <div className="flex">
           <a
             href={linkedIn}
             title={`Follow ${fullName} on LinkedIn`}
             target="_blank"
+            rel="noopener noreferrer"
             className="pr-4"
           >
             LI
@@ -32,6 +33,7 @@ export function AuthorCard({
             href={twitter}
             title={`Follow ${fullName} on Twitter`}
             target="_blank"
+            rel="noopener noreferrer"
             className="pr-4"
           >
             TW

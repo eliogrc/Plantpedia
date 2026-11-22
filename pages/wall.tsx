@@ -8,11 +8,13 @@ import { Layout } from '@components/Layout'
 import { Comment, CommentProps } from '@components/Wall/Comment'
 import { Editor } from '@components/Wall/Editor'
 
-import { getSession, useSession } from '@auth/client'
+import { getServerSession } from 'next-auth/next'
+import { useSession } from '@auth/client'
 import { AccessDenied } from '@components/AccessDenied'
+import { authOptions } from 'pages/api/auth/[...nextauth]'
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const i18n = await serverSideTranslations(context.locale!)
 
   if (session === null) {
@@ -32,11 +34,15 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
 type Story = Pick<CommentProps, 'name' | 'imageUrl' | 'text'> & { id: string }
 
 export default function WallPage() {
-  const [session] = useSession()
+  const { data: session, status } = useSession()
   const [stories, setStories] = useState<Story[]>([])
   const { t } = useTranslation(['page-wall'])
 
-  if (session === null) {
+  if (status === 'loading') {
+    return null
+  }
+
+  if (!session) {
     return <AccessDenied></AccessDenied>
   }
   const addStory = (text: string) => {

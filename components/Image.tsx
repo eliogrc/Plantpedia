@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { CSSProperties, useCallback } from 'react'
 import NextImage, {
   ImageLoaderProps,
   ImageProps as NextImageProps,
@@ -7,15 +7,19 @@ import NextImage, {
 type ImageProps = {
   width: number
   height?: never
-  layout: ImageLayout
+  layout?: ImageLayout
   aspectRatio: AspectRatio
   fit?: ImageFit
-} & DistributiveOmit<NextImageProps, 'height'>
+  alt?: string
+} & DistributiveOmit<NextImageProps, 'height' | 'alt'>
 
 export function Image({
   width,
   fit = 'fill',
   aspectRatio,
+  layout = 'intrinsic',
+  alt = '',
+  style,
   ...nextImageProps
 }: ImageProps) {
   const height = calcAspectRatio(aspectRatio, width)
@@ -29,11 +33,32 @@ export function Image({
     [aspectRatio, fit]
   )
 
+  let layoutStyle: CSSProperties | undefined = style
+  if (layout === 'intrinsic') {
+    layoutStyle = { maxWidth: '100%', height: 'auto', ...style }
+  } else if (layout === 'responsive') {
+    layoutStyle = { width: '100%', height: 'auto', ...style }
+  }
+
+  if (layout === 'fill') {
+    return (
+      <NextImage
+        {...nextImageProps}
+        alt={alt}
+        fill
+        style={layoutStyle}
+        loader={imageLoader}
+      />
+    )
+  }
+
   return (
     <NextImage
       {...nextImageProps}
+      alt={alt}
       width={width}
       height={height}
+      style={layoutStyle}
       loader={imageLoader}
     />
   )
@@ -43,7 +68,6 @@ export type ImageFit = 'pad' | 'fill' | 'scale' | 'crop' | 'thumb'
 
 export type AspectRatio = '16:9' | '4:3' | '1:1' | '3:2' | '9:12'
 
-// Next.js sadly don't export it
 export type ImageLayout = 'fill' | 'fixed' | 'intrinsic' | 'responsive'
 
 // https://davidgomes.com/pick-omit-over-union-types-in-typescript/

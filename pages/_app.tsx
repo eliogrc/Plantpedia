@@ -2,7 +2,7 @@ import { AppProps } from 'next/app'
 import { appWithTranslation } from 'next-i18next'
 import { useServerStyles } from '@ui/ssr'
 import { UIProvider } from '@ui/Provider'
-import { Provider as AuthProvider } from 'next-auth/client'
+import { SessionProvider as AuthProvider } from 'next-auth/react'
 import '../ui/globals.css'
 import { QueryProvider } from '@api/QueryProvider'
 

@@ -8,10 +8,12 @@ import { Button } from '@ui/Button'
 import { Layout } from '@components/Layout'
 import { AccessDenied } from '@components/AccessDenied'
 
-import { useSession, getSession } from '@auth/client'
+import { getServerSession } from 'next-auth/next'
+import { useSession } from '@auth/client'
+import { authOptions } from 'pages/api/auth/[...nextauth]'
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const i18n = await serverSideTranslations(context.locale!)
 
   if (session == null) {
@@ -29,7 +31,8 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
 }
 
 function PremiumPage() {
-  const [session, loading] = useSession()
+  const { data: session, status } = useSession()
+  const loading = status === 'loading'
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [refetchCounter, refetch] = useState(0)
   const { t } = useTranslation(['page-premium'])

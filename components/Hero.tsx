@@ -13,16 +13,14 @@ export function Hero({ plantName, slug, image, className }: HeroProps) {
           <Image layout='intrinsic' src={image.url} width={600} aspectRatio='9:12' />
         </div>
         <div className="text-container absolute">
-          <Link href={`/entry/${slug}`} prefetch={false}>
-            <a title={`Go to ${plantName}`}>
-              <Typography
-                variant="h1"
-                component="h2"
-                className="break-words text-left text-6xl sm:text-8xl"
-              >
-                {plantName}
-              </Typography>
-            </a>
+          <Link href={`/entry/${slug}`} prefetch={false} title={`Go to ${plantName}`}>
+            <Typography
+              variant="h1"
+              component="h2"
+              className="break-words text-left text-6xl sm:text-8xl"
+            >
+              {plantName}
+            </Typography>
           </Link>
         </div>
       </div>

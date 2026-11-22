@@ -140,8 +140,8 @@ export default function PlantEntryPage({
             <ul className="list">
               {categories.map((category) => (
                 <li key={category.id}>
-                  <Link passHref prefetch={false} href={`/category/${category.slug}`}>
-                    <Typography component="a" variant="h6">
+                  <Link prefetch={false} href={`/category/${category.slug}`}>
+                    <Typography component="span" variant="h6">
                       {category.title}
                     </Typography>
                   </Link>

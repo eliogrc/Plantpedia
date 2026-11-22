@@ -20,9 +20,7 @@ const ContentSecurityPolicy = [
 ].join('; ')
 
 const nextConfig = {
-  future: {
-    webpack5: true,
-  },
+  output: 'standalone',
   poweredByHeader: false,
   // Desactivar source maps en producción
   productionBrowserSourceMaps: false,
@@ -77,12 +75,11 @@ const nextConfig = {
       },
     ]
   },
-  // Turns off the built-in optimizer (/_next/image answers 404): it carries Next 10's
-  // critical RCE advisories, and every image already uses Contentful's own resizing
-  // through the custom loader in components/Image.tsx.
+  // Turns off the built-in optimizer (/_next/image answers 404): every image uses
+  // Contentful's own CDN resizing through components/Image.tsx.
   images: {
-    loader: 'imgix',
-    path: 'https://images.ctfassets.net/',
+    loader: 'custom',
+    loaderFile: './lib/contentfulImageLoader.js',
   },
   i18n,
 }

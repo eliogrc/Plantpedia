@@ -1,14 +1,14 @@
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
+import { createTheme } from '@material-ui/core/styles'
 import { grey, common, lightGreen } from '@material-ui/core/colors'
 
-const muiTheme = createMuiTheme()
+const muiTheme = createTheme()
 
 // It matches tailwind.config.js
 const fontSerif = `'Nunito', sans-serif;`
 
 // Build your own theme with the Color Theme tool
 // @see https://material.io/resources/color/
-export const theme = createMuiTheme({
+export const theme = createTheme({
   palette: {
     primary: {
       main: grey['900'],

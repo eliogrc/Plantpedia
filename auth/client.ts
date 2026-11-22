@@ -1,8 +1,8 @@
 export {
-  Provider as SessionProvider,
+  SessionProvider,
   useSession,
   getSession,
   getCsrfToken,
   signIn,
   signOut,
-} from 'next-auth/client'
+} from 'next-auth/react'

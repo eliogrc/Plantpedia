@@ -26,8 +26,8 @@ export function VerticalTabs({ tabs, currentTab, onTabChange }: TabsProps) {
   const classes = useStyles()
 
   const { tabItems, tabPanels } = tabs.reduce<{
-    tabItems: React.ReactNodeArray
-    tabPanels: React.ReactNodeArray
+    tabItems: React.ReactNode[]
+    tabPanels: React.ReactNode[]
   }>(
     (accumulator, tab, currentIndex) => {
       const { content, label, value } = tab

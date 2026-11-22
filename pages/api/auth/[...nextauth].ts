@@ -1,14 +1,18 @@
 import crypto from 'crypto'
 import NextAuth from 'next-auth'
 import type { NextAuthOptions } from 'next-auth'
-import Providers from 'next-auth/providers'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GithubProvider from 'next-auth/providers/github'
 
 const loginAttempts = new Map<string, { count: number; timestamp: number }>()
 const MAX_ATTEMPTS = 5
 const WINDOW_MS = 15 * 60 * 1000 // 15 minutes
 const MAX_TRACKED_IPS = 1000
 
-function getClientIp(req?: { headers?: Record<string, string | string[] | undefined>; socket?: { remoteAddress?: string } }): string {
+function getClientIp(req?: {
+  headers?: Record<string, string | string[] | undefined>
+  socket?: { remoteAddress?: string }
+}): string {
   const cfIp = req?.headers?.['cf-connecting-ip']
   if (typeof cfIp === 'string' && cfIp.trim()) {
     return cfIp.trim()
@@ -16,7 +20,10 @@ function getClientIp(req?: { headers?: Record<string, string | string[] | undefi
   const xff = req?.headers?.['x-forwarded-for']
   const rawXff = Array.isArray(xff) ? xff[xff.length - 1] : xff
   if (typeof rawXff === 'string' && rawXff.trim()) {
-    const parts = rawXff.split(',').map((p) => p.trim()).filter(Boolean)
+    const parts = rawXff
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean)
     if (parts.length > 0) {
       return parts[parts.length - 1]
     }
@@ -56,21 +63,18 @@ function timingSafeCompare(a: string, b: string): boolean {
   return crypto.timingSafeEqual(hashA, hashB) && a.length === b.length
 }
 
-const options: NextAuthOptions = {
-  theme: 'light',
+export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
+  theme: {
+    colorScheme: 'light',
+  },
   debug: process.env.NODE_ENV === 'development',
   session: {
-    jwt: true,
+    strategy: 'jwt',
     maxAge: 60 * 15, // 15 minutes
   },
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    signingKey: process.env.JWT_SIGNING_PRIVATE_KEY,
-    encryption: true,
-    encryptionKey: process.env.JWT_ENCRYPTION_KEY,
-  },
   providers: [
-    Providers.Credentials({
+    CredentialsProvider({
       name: 'Plantpedia',
       credentials: {
         password: {
@@ -78,7 +82,7 @@ const options: NextAuthOptions = {
           label: 'Ingresa tu contraseña',
         },
       },
-      async authorize(credentials: Record<string, string>, req: any) {
+      async authorize(credentials, req) {
         const expectedPassword = process.env.PLANTPEDIA_PASSWORD
         const providedPassword = credentials?.password
         if (
@@ -90,7 +94,7 @@ const options: NextAuthOptions = {
           return null
         }
 
-        const clientIp = getClientIp(req)
+        const clientIp = getClientIp(req as any)
         if (isRateLimited(clientIp)) {
           return null
         }
@@ -98,6 +102,7 @@ const options: NextAuthOptions = {
         if (timingSafeCompare(providedPassword, expectedPassword)) {
           loginAttempts.delete(clientIp)
           return {
+            id: 'plantpedia-user',
             name: 'Plantpedia user',
             email: 'user@plantpedia.com',
             image: '',
@@ -107,11 +112,11 @@ const options: NextAuthOptions = {
         return null
       },
     }),
-    Providers.GitHub({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+    GithubProvider({
+      clientId: process.env.GITHUB_ID || '',
+      clientSecret: process.env.GITHUB_SECRET || '',
     }),
   ],
 }
 
-export default NextAuth(options)
+export default NextAuth(authOptions)
