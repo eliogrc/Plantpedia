@@ -1,0 +1,83 @@
+name: Deploy Plantpedia to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-plantpedia
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: project-91e4b263-f7b3-419f-943
+  REGION: us-central1
+  SERVICE: plantpedia
+  IMAGE_REPO: us-central1-docker.pkg.dev/project-91e4b263-f7b3-419f-943/cloud-run-source-deploy/plantpedia
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies and type-check
+        run: |
+          yarn install --frozen-lockfile
+          yarn type-check
+
+      - name: Validate public build variables
+        run: |
+          if [ -z "${{ vars.NEXT_PUBLIC_SPACE_ID }}" ] || [ -z "${{ vars.NEXT_PUBLIC_ACCESS_TOKEN }}" ]; then
+            echo "Missing GitHub Actions variables NEXT_PUBLIC_SPACE_ID and/or NEXT_PUBLIC_ACCESS_TOKEN."
+            echo "Add them in Settings -> Secrets and variables -> Actions -> Variables."
+            exit 1
+          fi
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/867549891004/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider
+          service_account: github-deploy-plantpedia@project-91e4b263-f7b3-419f-943.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_REPO }}:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_SPACE_ID=${{ vars.NEXT_PUBLIC_SPACE_ID }}
+            NEXT_PUBLIC_ACCESS_TOKEN=${{ vars.NEXT_PUBLIC_ACCESS_TOKEN }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy revision to Cloud Run
+        run: |
+          gcloud run services update ${{ env.SERVICE }} \
+            --project=${{ env.PROJECT_ID }} \
+            --region=${{ env.REGION }} \
+            --image=${{ env.IMAGE_REPO }}:${{ github.sha }} \
+            --min-instances=0 \
+            --max-instances=1 \
+            --no-default-url

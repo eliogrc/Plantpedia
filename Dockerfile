@@ -5,7 +5,11 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --network-timeout 600000
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN yarn build
+ARG NEXT_PUBLIC_SPACE_ID
+ARG NEXT_PUBLIC_ACCESS_TOKEN
+RUN if [ -n "$NEXT_PUBLIC_SPACE_ID" ]; then printf 'NEXT_PUBLIC_SPACE_ID=%s\n' "$NEXT_PUBLIC_SPACE_ID" >> .env.production; fi \
+ && if [ -n "$NEXT_PUBLIC_ACCESS_TOKEN" ]; then printf 'NEXT_PUBLIC_ACCESS_TOKEN=%s\n' "$NEXT_PUBLIC_ACCESS_TOKEN" >> .env.production; fi \
+ && yarn build
 
 FROM node:24-alpine AS runner
 WORKDIR /app
