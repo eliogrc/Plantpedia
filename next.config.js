@@ -21,6 +21,9 @@ const ContentSecurityPolicy = [
 
 const nextConfig = {
   output: 'standalone',
+  // Material UI v4 uses findDOMNode internally in TouchRipple/Modal; disabling
+  // StrictMode silences the React 18 StrictMode findDOMNode dev warning.
+  reactStrictMode: false,
   poweredByHeader: false,
   // Desactivar source maps en producción
   productionBrowserSourceMaps: false,

@@ -33,7 +33,14 @@ class MyDocument extends Document {
   render() {
     return (
       <Html className="text-gray-900 leading-tight">
-        <Head />
+        <Head>
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <noscript id="mui-insertion-point" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+            rel="stylesheet"
+          />
+        </Head>
         <body className="min-h-screen bg-gray-100 overflow-x-hidden">
           <Main />
           <NextScript />

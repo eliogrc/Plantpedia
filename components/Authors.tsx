@@ -14,7 +14,7 @@ export function Authors({ className }: AuthorProps) {
   if (data == null || status !== 'success') {
     const dummyItems = Array.from({ length: 4 }, (_, i) => `item-${i}`)
     return (
-      <Grid container spacing={4} className={className} justify="center">
+      <Grid container spacing={4} className={className} justifyContent="center">
         {dummyItems.map((item) => (
           <Grid
             xs={2}
@@ -28,7 +28,7 @@ export function Authors({ className }: AuthorProps) {
   }
 
   return (
-    <Grid container spacing={4} className={className} justify="center">
+    <Grid container spacing={4} className={className} justifyContent="center">
       {data.map(({ id, photo, fullName, handle }) => (
         <Grid item key={id}>
           <Link

@@ -7,14 +7,16 @@ import { Button } from '@ui/Button'
 import { signIn, signOut, useSession } from 'next-auth/react'
 
 export function TopArea() {
-  return (<Grid container justify='space-between'>
-    <Grid item>
-      <LoginLogout />
+  return (
+    <Grid container justifyContent="space-between">
+      <Grid item>
+        <LoginLogout />
+      </Grid>
+      <Grid item>
+        <LocaleOptions />
+      </Grid>
     </Grid>
-    <Grid item>
-      <LocaleOptions />
-    </Grid>
-  </Grid>)
+  )
 }
 
 function LoginLogout() {
