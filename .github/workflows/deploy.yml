@@ -38,10 +38,15 @@ jobs:
           yarn type-check
 
       - name: Validate public build variables
+        env:
+          SPACE_ID: ${{ vars.NEXT_PUBLIC_SPACE_ID || secrets.NEXT_PUBLIC_SPACE_ID }}
+          ACCESS_TOKEN: ${{ vars.NEXT_PUBLIC_ACCESS_TOKEN || secrets.NEXT_PUBLIC_ACCESS_TOKEN }}
         run: |
-          if [ -z "${{ vars.NEXT_PUBLIC_SPACE_ID }}" ] || [ -z "${{ vars.NEXT_PUBLIC_ACCESS_TOKEN }}" ]; then
-            echo "Missing GitHub Actions variables NEXT_PUBLIC_SPACE_ID and/or NEXT_PUBLIC_ACCESS_TOKEN."
-            echo "Add them in Settings -> Secrets and variables -> Actions -> Variables."
+          echo "NEXT_PUBLIC_SPACE_ID present: $([ -n "$SPACE_ID" ] && echo yes || echo NO)"
+          echo "NEXT_PUBLIC_ACCESS_TOKEN present: $([ -n "$ACCESS_TOKEN" ] && echo yes || echo NO)"
+          if [ -z "$SPACE_ID" ] || [ -z "$ACCESS_TOKEN" ]; then
+            echo "Missing NEXT_PUBLIC_SPACE_ID and/or NEXT_PUBLIC_ACCESS_TOKEN."
+            echo "Add them in Settings -> Secrets and variables -> Actions (either Variables or Secrets tab)."
             exit 1
           fi
 
@@ -67,8 +72,8 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_REPO }}:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_SPACE_ID=${{ vars.NEXT_PUBLIC_SPACE_ID }}
-            NEXT_PUBLIC_ACCESS_TOKEN=${{ vars.NEXT_PUBLIC_ACCESS_TOKEN }}
+            NEXT_PUBLIC_SPACE_ID=${{ vars.NEXT_PUBLIC_SPACE_ID || secrets.NEXT_PUBLIC_SPACE_ID }}
+            NEXT_PUBLIC_ACCESS_TOKEN=${{ vars.NEXT_PUBLIC_ACCESS_TOKEN || secrets.NEXT_PUBLIC_ACCESS_TOKEN }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
