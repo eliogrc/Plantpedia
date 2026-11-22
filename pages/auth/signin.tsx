@@ -40,9 +40,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const session = await getServerSession(context.req, context.res, authOptions)
   if (session) {
+    const localePrefix =
+      context.locale && context.locale !== context.defaultLocale
+        ? `/${context.locale}`
+        : ''
     return {
       redirect: {
-        destination: '/',
+        destination: localePrefix || '/',
         permanent: false,
       },
     }
@@ -94,7 +98,15 @@ export default function SignInPage() {
       })
 
       if (result?.ok) {
-        await router.push(callbackUrl)
+        const hasLocalePrefix = (router.locales || []).some(
+          (loc) =>
+            callbackUrl === `/${loc}` || callbackUrl.startsWith(`/${loc}/`)
+        )
+        await router.push(
+          callbackUrl,
+          undefined,
+          hasLocalePrefix ? { locale: false } : undefined
+        )
       } else {
         setErrorMessage(t('invalidCredentials'))
         setSubmitting(false)

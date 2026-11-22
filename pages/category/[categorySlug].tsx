@@ -30,6 +30,7 @@ export const getStaticProps: GetStaticProps<CategoryPageProps> = async ({
   ) {
     return {
       notFound: true,
+      revalidate: 60,
     }
   }
   try {
@@ -54,6 +55,7 @@ export const getStaticProps: GetStaticProps<CategoryPageProps> = async ({
   } catch (e) {
     return {
       notFound: true,
+      revalidate: 60,
     }
   }
 }

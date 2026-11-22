@@ -37,6 +37,7 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   ) {
     return {
       notFound: true,
+      revalidate: 60,
     }
   }
   try {
@@ -58,6 +59,7 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   } catch (e) {
     return {
       notFound: true,
+      revalidate: 60,
     }
   }
 }

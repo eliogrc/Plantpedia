@@ -18,9 +18,15 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
   const i18n = await serverSideTranslations(context.locale!)
 
   if (session === null) {
+    const localePrefix =
+      context.locale && context.locale !== context.defaultLocale
+        ? `/${context.locale}`
+        : ''
     return {
       redirect: {
-        destination: '/auth/signin?callbackUrl=/wall',
+        destination: `${localePrefix}/auth/signin?callbackUrl=${encodeURIComponent(
+          `${localePrefix}/wall`
+        )}`,
         permanent: false,
       },
     }

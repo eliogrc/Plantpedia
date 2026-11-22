@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { GetServerSideProps } from 'next'
+import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next'
 
@@ -17,9 +18,15 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
   const i18n = await serverSideTranslations(context.locale!)
 
   if (session == null) {
+    const localePrefix =
+      context.locale && context.locale !== context.defaultLocale
+        ? `/${context.locale}`
+        : ''
     return {
       redirect: {
-        destination: '/auth/signin?callbackUrl=/premium',
+        destination: `${localePrefix}/auth/signin?callbackUrl=${encodeURIComponent(
+          `${localePrefix}/premium`
+        )}`,
         permanent: false,
       },
     }
@@ -31,17 +38,51 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
 }
 
 function PremiumPage() {
+  const router = useRouter()
   const { data: session, status } = useSession()
   const loading = status === 'loading'
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [refetchCounter, refetch] = useState(0)
   const { t } = useTranslation(['page-premium'])
 
+  const hasSession = session != null
+
   useEffect(() => {
+    if (!hasSession) return
+    let cancelled = false
+
     fetch('/api/premium')
-      .then((response) => response.json())
-      .then(({ data }) => setImageUrl(data))
-  }, [refetchCounter])
+      .then((response) => {
+        if (response.status === 401) {
+          const localePrefix =
+            router.locale && router.locale !== router.defaultLocale
+              ? `/${router.locale}`
+              : ''
+          router.replace(
+            `${localePrefix}/auth/signin?callbackUrl=${encodeURIComponent(
+              `${localePrefix}/premium`
+            )}`,
+            undefined,
+            { locale: false }
+          )
+          return null
+        }
+        if (!response.ok) return null
+        return response.json()
+      })
+      .then((payload) => {
+        if (!cancelled && payload?.data) {
+          setImageUrl(payload.data)
+        }
+      })
+      .catch(() => {
+        // ignore transient network errors
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [refetchCounter, hasSession])
 
   if (loading) {
     return null

@@ -9,7 +9,11 @@ import { QueryProvider } from '@api/QueryProvider'
 const NextApp = ({ Component, pageProps }: AppProps) => {
   useServerStyles()
   return (
-    <AuthProvider session={pageProps.session}>
+    <AuthProvider
+      session={pageProps.session}
+      refetchOnWindowFocus={false}
+      refetchWhenOffline={false}
+    >
       <QueryProvider>
         <UIProvider>
           <Component {...pageProps} />

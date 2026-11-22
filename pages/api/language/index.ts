@@ -10,6 +10,11 @@ const ALLOWED_LOCALES = new Set(['en-US', 'es'])
 const PREFERRED_LOCALE_COOKIE = 'NEXT_LOCALE'
 
 const language: NextApiHandler = (request, response): any => {
+  response.setHeader(
+    'Cache-Control',
+    'private, no-cache, no-store, max-age=0, must-revalidate'
+  )
+
   if (request.method === 'GET') {
     const cookieLocale = request.cookies[PREFERRED_LOCALE_COOKIE] || ''
     const preferredLocale = ALLOWED_LOCALES.has(cookieLocale) ? cookieLocale : ''
@@ -36,8 +41,10 @@ const language: NextApiHandler = (request, response): any => {
       secure: process.env.NODE_ENV === 'production',
     })
 
-    // 307 (temporary) redirect to homepage
-    response.redirect('/')
+    // 303 See Other converts POST to GET and lands directly on the target locale URL
+    const redirectPath =
+      newPreferredLocale === DEFAULT_LOCALE ? '/' : `/${newPreferredLocale}`
+    response.redirect(303, redirectPath)
     return response.end()
   }
 
