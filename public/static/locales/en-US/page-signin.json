@@ -1,0 +1,13 @@
+{
+  "title": "Sign in",
+  "subtitle": "Access exclusive Plantpedia content",
+  "passwordLabel": "Enter your password",
+  "passwordPlaceholder": "Password",
+  "signInWithPlantpedia": "Sign in with Plantpedia",
+  "signingIn": "Signing in...",
+  "or": "or",
+  "signInWithGitHub": "Sign in with GitHub",
+  "backHome": "Back to home",
+  "invalidCredentials": "Invalid password or too many attempts. Please try again.",
+  "authError": "Could not complete sign in. Please try again."
+}

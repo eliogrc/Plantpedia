@@ -19,7 +19,7 @@ export function AccessDenied() {
         <Button
           color="primary"
           variant="contained"
-          href="/api/auth/signin"
+          href="/auth/signin"
           title={t('signIn')}
         >
           {t('signIn')}

@@ -65,6 +65,9 @@ function timingSafeCompare(a: string, b: string): boolean {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
+  pages: {
+    signIn: '/auth/signin',
+  },
   theme: {
     colorScheme: 'light',
   },

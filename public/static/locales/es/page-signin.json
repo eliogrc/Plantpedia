@@ -1,0 +1,13 @@
+{
+  "title": "Iniciar sesión",
+  "subtitle": "Accede al contenido exclusivo de Plantpedia",
+  "passwordLabel": "Ingresa tu contraseña",
+  "passwordPlaceholder": "Contraseña",
+  "signInWithPlantpedia": "Ingresar con Plantpedia",
+  "signingIn": "Ingresando...",
+  "or": "o",
+  "signInWithGitHub": "Ingresar con GitHub",
+  "backHome": "Regresar al inicio",
+  "invalidCredentials": "Contraseña incorrecta o demasiados intentos. Inténtalo de nuevo.",
+  "authError": "No se pudo completar el inicio de sesión. Inténtalo nuevamente."
+}
