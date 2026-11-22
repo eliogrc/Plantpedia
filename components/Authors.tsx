@@ -31,7 +31,7 @@ export function Authors({ className }: AuthorProps) {
     <Grid container spacing={4} className={className} justify="center">
       {data.map(({ id, photo, fullName, handle }) => (
         <Grid item key={id}>
-          <Link href={`/top-stories/${handle}`}>
+          <Link href={`/top-stories/${handle}`} prefetch={false}>
             <a title={`See latest stories from ${fullName}`}>
               <img src={photo.url} width={150} />
               <Typography variant="h5" component="p">

@@ -11,12 +11,14 @@ type HomeProps = {
 }
 
 export const getStaticProps: GetStaticProps<HomeProps> = async ({ locale }) => {
-  const plants = await getPlantList({ limit: 10, locale  })
-	const i18nConf = await serverSideTranslations(locale!)
+  const [plants, i18nConf] = await Promise.all([
+    getPlantList({ limit: 10, locale }),
+    serverSideTranslations(locale!),
+  ])
 
   return {
     props: { plants, ...i18nConf },
-    revalidate: 5 * 60, // once every five minutes
+    revalidate: 60 * 60, // once every hour
   }
 }
 

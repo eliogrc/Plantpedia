@@ -13,7 +13,7 @@ export function Hero({ plantName, slug, image, className }: HeroProps) {
           <Image layout='intrinsic' src={image.url} width={600} aspectRatio='9:12' />
         </div>
         <div className="text-container absolute">
-          <Link href={`/entry/${slug}`}>
+          <Link href={`/entry/${slug}`} prefetch={false}>
             <a title={`Go to ${plantName}`}>
               <Typography
                 variant="h1"

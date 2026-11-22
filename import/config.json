@@ -1,5 +1,5 @@
 {
-  "spaceId": "w34nyj5hhyfo",
-  "managementToken": "zOcObY8PwomOsPwUk8kpgFs63I6htT-px8BMfkb1dos",
+  "spaceId": "YOUR_CONTENTFUL_SPACE_ID",
+  "managementToken": "YOUR_CONTENTFUL_MANAGEMENT_TOKEN",
   "contentFile": "import/contentful-platzipedia.json"
 }

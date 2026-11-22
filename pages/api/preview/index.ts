@@ -1,14 +1,30 @@
+import crypto from 'crypto'
 import { NextApiHandler } from 'next'
 import { getPlant } from '@api'
 
+const SLUG_REGEX = /^[a-z0-9-]+$/i
+
+function timingSafeCompare(a: string, b: string): boolean {
+  const hashA = crypto.createHash('sha256').update(a).digest()
+  const hashB = crypto.createHash('sha256').update(b).digest()
+  return crypto.timingSafeEqual(hashA, hashB) && a.length === b.length
+}
+
 const enablePreview: NextApiHandler = async (request, response) => {
   const slug = request.query.slug
-  // Check the secret and next parameters
-  // This secret should only be known to this API route and the CMS
+  const secret = request.query.secret
+  const expectedSecret = process.env.PREVIEW_SECRET
+
   if (
-    request.query.secret !== process.env.NEXT_PUBLIC_PREVIEW_SECRET ||
+    typeof expectedSecret !== 'string' ||
+    expectedSecret.length === 0 ||
+    typeof secret !== 'string' ||
+    secret.length === 0 ||
+    !timingSafeCompare(secret, expectedSecret) ||
     typeof slug !== 'string' ||
-    slug === ''
+    slug.length === 0 ||
+    slug.length > 120 ||
+    !SLUG_REGEX.test(slug)
   ) {
     return response.status(401).json({ message: 'Invalid token' })
   }
@@ -18,11 +34,9 @@ const enablePreview: NextApiHandler = async (request, response) => {
     const plant = await getPlant(slug, true)
 
     // Enable Preview Mode by setting the cookies
-    /* La forma en que setPreviewData funciona es a través de cookies */
     response.setPreviewData({})
 
-    //Redirect to the path from the fetched plant
-    // We don't redirect to request.query.slug as that might lead to
+    // Redirect to the path from the fetched plant
     response.redirect(`/entry/${plant.slug}`)
   } catch (e) {
     if (process.env.NODE_ENV !== 'production') {

@@ -42,6 +42,9 @@ def log(message):
 
 
 def token():
+    env_token = os.environ.get('GCLOUD_ACCESS_TOKEN', '').strip()
+    if env_token:
+        return env_token
     out = subprocess.run(['gcloud', 'auth', 'print-access-token'], capture_output=True, text=True).stdout.strip()
     if not out:
         sys.exit('Could not get an access token: run `gcloud auth login` first.')
@@ -135,7 +138,37 @@ def main():
 
     template = service['template']
     template['containers'][0]['image'] = image
-    call(f'{service_url}?updateMask=template', 'PATCH', {'template': template})
+    # Enforce strict cost-cap scaling on every deploy
+    scaling = template.setdefault('scaling', {})
+    scaling['minInstanceCount'] = 0
+    scaling['maxInstanceCount'] = 1
+
+    # Migrate legacy NEXT_PUBLIC_PREVIEW_* env vars to server-only names
+    env_renames = {
+        'NEXT_PUBLIC_PREVIEW_SECRET': 'PREVIEW_SECRET',
+        'NEXT_PUBLIC_PREVIEW_ACCESS_TOKEN': 'CONTENTFUL_PREVIEW_ACCESS_TOKEN',
+    }
+    env_list = template['containers'][0].get('env', [])
+    existing_names = {entry.get('name') for entry in env_list}
+    migrated_env = []
+    for entry in env_list:
+        name = entry.get('name')
+        if name in env_renames:
+            new_name = env_renames[name]
+            if new_name not in existing_names:
+                renamed = dict(entry)
+                renamed['name'] = new_name
+                migrated_env.append(renamed)
+                existing_names.add(new_name)
+                log(f'migrated Cloud Run env var {name} -> {new_name}')
+        else:
+            migrated_env.append(entry)
+    template['containers'][0]['env'] = migrated_env
+
+    call(f'{service_url}?updateMask=template,defaultUriDisabled', 'PATCH', {
+        'template': template,
+        'defaultUriDisabled': True,
+    })
     log('new revision requested')
     for _ in range(60):
         time.sleep(10)
@@ -146,7 +179,7 @@ def main():
         if not service.get('reconciling') and state.get('state') == 'CONDITION_SUCCEEDED' \
                 and service.get('latestReadyRevision') != previous:
             log(f'serving revision {service["latestReadyRevision"].split("/")[-1]}')
-            print('URL', service['uri'])
+            print('URL', service.get('uri', '(default *.run.app URL disabled)'))
             return
     sys.exit('Timed out waiting for the new revision.')
 

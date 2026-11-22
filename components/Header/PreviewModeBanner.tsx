@@ -1,29 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 import { Button } from '@ui/Button'
 import { Alert } from '@ui/Alert'
 
-type PreviewStatusResponse = {
-  preview: boolean
-  context: Json
-} | null
-
 export function PreviewModeBanner() {
-  const [isEnabled, setIsEnabled] = useState(false)
+  const { isPreview } = useRouter()
 
-  useEffect(() => {
-    try {
-      fetch('/api/preview/status')
-        .then((response) => response.json())
-        .then((data: PreviewStatusResponse) => {
-          setIsEnabled(data?.preview || false)
-        })
-    } catch (e) {
-      // ignore
-    }
-  }, [])
-
-  if (!isEnabled) {
+  if (!isPreview) {
     return null
   }
 

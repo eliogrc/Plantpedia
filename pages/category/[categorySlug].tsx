@@ -15,23 +15,32 @@ type CategoryPageProps = {
   category: Category
 }
 
+const SLUG_REGEX = /^[a-z0-9-]+$/i
+
 export const getStaticProps: GetStaticProps<CategoryPageProps> = async ({
   params,
   locale,
 }) => {
   const slug = params?.categorySlug
-  if (typeof slug !== 'string') {
+  if (
+    typeof slug !== 'string' ||
+    slug.length === 0 ||
+    slug.length > 80 ||
+    !SLUG_REGEX.test(slug)
+  ) {
     return {
       notFound: true,
     }
   }
   try {
-    const { entries, category } = await getPlantListByCategory({
-      category: slug,
-      limit: 12,
-      locale: locale,
-    })
-    const i18nConf = await serverSideTranslations(locale!)
+    const [{ entries, category }, i18nConf] = await Promise.all([
+      getPlantListByCategory({
+        category: slug,
+        limit: 12,
+        locale: locale,
+      }),
+      serverSideTranslations(locale!),
+    ])
 
     return {
       props: {
@@ -40,7 +49,7 @@ export const getStaticProps: GetStaticProps<CategoryPageProps> = async ({
         status: 'success',
         ...i18nConf,
       },
-      revalidate: 15 * 60, // once every fifteen minutes
+      revalidate: 60 * 60, // once every hour
     }
   } catch (e) {
     return {

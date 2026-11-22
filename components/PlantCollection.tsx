@@ -62,7 +62,7 @@ export function PlantEntry({ plant, variant = 'square' }: PlantEntryType) {
 
 export function PlantEntrySquare({ image, plantName, slug }: Plant) {
   return (
-    <Link href={`/entry/${slug}`}>
+    <Link href={`/entry/${slug}`} prefetch={false}>
       <a title={`Go to ${plantName}`}>
         <div className="opacity-95 hover:opacity-100">
           <Image
@@ -89,7 +89,7 @@ export function PlantEntryInline({
   className,
 }: Plant & { className?: string }) {
   return (
-    <Link href={`/entry/${slug}`}>
+    <Link href={`/entry/${slug}`} prefetch={false}>
       <a title={`Go to ${plantName}`}>
         <div
           className={`opacity-95 hover:opacity-100 flex items-end ${className}`}
@@ -121,7 +121,7 @@ export function PlantEntryVertical({
 }: Plant) {
   return (
     <div className="opacity-95 hover:opacity-100">
-      <Link href={`/entry/${slug}`}>
+      <Link href={`/entry/${slug}`} prefetch={false}>
         <a title={`Go to ${plantName}`}>
           <Image
             src={image.url}
@@ -140,7 +140,7 @@ export function PlantEntryVertical({
           color="textSecondary"
           className="py-6"
         />
-        <Link href={`/entry/${slug}`} passHref>
+        <Link href={`/entry/${slug}`} prefetch={false} passHref>
           <Button>Read more</Button>
         </Link>
       </div>

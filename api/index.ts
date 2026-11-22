@@ -44,8 +44,8 @@ export function getPlant(
 ): Promise<Plant> {
   const extraHeaders: HeadersInit = {}
   if (isPreview) {
-    // Use the preview access token for auth
-    extraHeaders['Authorization'] = `Bearer ${process.env.NEXT_PUBLIC_PREVIEW_ACCESS_TOKEN}`
+    // Use the server-only preview access token for auth
+    extraHeaders['Authorization'] = `Bearer ${process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN}`
   }
 
   return api

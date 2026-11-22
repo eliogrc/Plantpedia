@@ -1,5 +1,4 @@
 import clsx from 'clsx'
-import sanitizeHtml from 'sanitize-html'
 
 import { Typography } from '@ui/Typography'
 
@@ -11,17 +10,8 @@ export type CommentProps = {
 }
 
 export function Comment(props: CommentProps) {
-  const image = props.imageUrl ?? 'platzi.png'
+  const image = props.imageUrl || '/leaf.png'
   const name = props.name ?? 'Plantpedia user'
-  
-  // Sanitizar HTML para prevenir XSS
-  const sanitizedText = sanitizeHtml(props.text, {
-    allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'br'],
-    allowedAttributes: {
-      'a': ['href', 'target', 'rel']
-    },
-    allowedSchemes: ['http', 'https', 'mailto']
-  })
 
   return (
     <article className="p-6 border-t-2 border-gray-300 flex">
@@ -38,7 +28,9 @@ export function Comment(props: CommentProps) {
         <header className="mb-2">
           <Typography variant="h6">{name}</Typography>
         </header>
-        <div dangerouslySetInnerHTML={{ __html: sanitizedText }} />
+        <Typography variant="body1" className="whitespace-pre-line break-words">
+          {props.text}
+        </Typography>
       </div>
     </article>
   )

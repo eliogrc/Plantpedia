@@ -31,7 +31,7 @@ export function Header() {
 
 function NavLink({ children, ...linkProps }: PropsWithChildren<LinkProps>) {
   return (
-    <Link {...linkProps} passHref>
+    <Link {...linkProps} prefetch={false} passHref>
       <Button color="inherit" variant="text" component="a">
         {children}
       </Button>

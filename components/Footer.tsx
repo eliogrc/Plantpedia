@@ -56,7 +56,12 @@ export const Footer = ({ className }: { className?: string }) => {
         <div className="mt-20 border-t-2 border-gray-600 text-gray-600 pt-6 flex justify-between">
           <p>
             {t('imagesFrom')}{' '}
-            <a target="_blank" href="https://www.pexels.com" title="Pexels">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.pexels.com"
+              title="Pexels"
+            >
               Pexels
             </a>
           </p>

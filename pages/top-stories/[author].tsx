@@ -21,9 +21,16 @@ type TopStoriesPageProps = {
   status: 'error' | 'sucess'
 }
 
+const HANDLE_REGEX = /^[a-z0-9-_]+$/i
+
 export const getServerSideProps: GetServerSideProps<TopStoriesPageProps> =
   async ({ params, locale }) => {
-    const authorHandle = String(params?.author)
+    const authorHandle = String(params?.author || '')
+    if (!authorHandle || authorHandle.length > 80 || !HANDLE_REGEX.test(authorHandle)) {
+      return {
+        notFound: true,
+      }
+    }
 
     try {
       const authors = await getAuthorList({ limit: 10 })

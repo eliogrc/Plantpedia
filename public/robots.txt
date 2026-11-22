@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /premium
+Disallow: /wall
+Disallow: /es/premium
+Disallow: /es/wall
+

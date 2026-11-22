@@ -21,25 +21,31 @@ type PlantEntryPageProps = {
   categories: Category[]
 }
 
+const SLUG_REGEX = /^[a-z0-9-]+$/i
+
 export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   params,
   preview,
   locale,
 }) => {
   const slug = params?.slug
-  if (typeof slug !== 'string') {
+  if (
+    typeof slug !== 'string' ||
+    slug.length === 0 ||
+    slug.length > 120 ||
+    !SLUG_REGEX.test(slug)
+  ) {
     return {
       notFound: true,
     }
   }
   try {
-    const plant = await getPlant(slug, preview, locale)
-    const i18nConf = await serverSideTranslations(locale!)
-    // Sidebar – This could be a single request since we are using GraphQL :)
-    const otherEntries = await getPlantList({
-      limit: 5,
-    })
-    const categories = await getCategoryList({ limit: 10 })
+    const [plant, i18nConf, otherEntries, categories] = await Promise.all([
+      getPlant(slug, preview, locale),
+      serverSideTranslations(locale!),
+      getPlantList({ limit: 5 }),
+      getCategoryList({ limit: 10 }),
+    ])
     return {
       props: {
         plant,
@@ -47,7 +53,7 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
         categories,
         ...i18nConf,
       },
-      revalidate: 5 * 60, // once every five minutes
+      revalidate: 60 * 60, // once every hour
     }
   } catch (e) {
     return {
@@ -134,7 +140,7 @@ export default function PlantEntryPage({
             <ul className="list">
               {categories.map((category) => (
                 <li key={category.id}>
-                  <Link passHref href={`/category/${category.slug}`}>
+                  <Link passHref prefetch={false} href={`/category/${category.slug}`}>
                     <Typography component="a" variant="h6">
                       {category.title}
                     </Typography>
